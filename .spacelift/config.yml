@@ -8,6 +8,7 @@ stack_defaults:
     # to use. Tighten it to 0600 before Ansible connects.
     before_init:
         - 'chmod 600 "$ANSIBLE_PRIVATE_KEY_FILE"'
-        # TEMPORARY (remove once a connect is confirmed): prove it works.
-        - 'echo "perms after chmod:"; ls -la "$ANSIBLE_PRIVATE_KEY_FILE"'
-        - 'echo "ssh test:"; ssh -i "$ANSIBLE_PRIVATE_KEY_FILE" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@91.239.86.79 "echo CONNECTED_OK; whoami" 2>&1 | tail -5 || true'
+        # TEMPORARY diagnostics: verify the worker's key content matches yours.
+        - 'echo "=== bytes / first / last line ==="; wc -c "$ANSIBLE_PRIVATE_KEY_FILE"; head -1 "$ANSIBLE_PRIVATE_KEY_FILE"; tail -1 "$ANSIBLE_PRIVATE_KEY_FILE"'
+        - 'echo "=== PUBKEY derived from the worker key (compare to your laptop/host) ==="; ssh-keygen -y -f "$ANSIBLE_PRIVATE_KEY_FILE" || echo "WORKER KEY DID NOT PARSE"'
+        - 'echo "=== auth negotiation ==="; ssh -vvv -i "$ANSIBLE_PRIVATE_KEY_FILE" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@91.239.86.79 "echo CONNECTED_OK" 2>&1 | grep -Ei "offering|server accepts|authentications that can continue|denied|load key|invalid format|CONNECTED_OK" | tail -25 || true'

@@ -4,10 +4,10 @@ stack_defaults:
     runner_image: public.ecr.aws/spacelift/runner-ansible-aws:latest
     environment:
         ANSIBLE_CONFIG: /mnt/workspace/source/ansible.cfg
-    # TEMPORARY: keep until a successful connect is confirmed, then remove.
-    # Checks the key perms and does a verbose SSH attempt with the SAME path
-    # the stack's ANSIBLE_PRIVATE_KEY_FILE env var points at.
+    # Spacelift delivers the mounted SSH key as mode 0777, which OpenSSH refuses
+    # to use. Tighten it to 0600 before Ansible connects.
     before_init:
-        - 'echo "===== ANSIBLE_PRIVATE_KEY_FILE = $ANSIBLE_PRIVATE_KEY_FILE ====="'
-        - 'echo "===== key perms ====="; ls -la "$ANSIBLE_PRIVATE_KEY_FILE" || echo "NOT FOUND at that path"'
-        - 'echo "===== ssh test using that key ====="; ssh -vvv -i "$ANSIBLE_PRIVATE_KEY_FILE" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@91.239.86.79 "echo CONNECTED_OK; whoami; df -h" 2>&1 | tail -40 || true'
+        - 'chmod 600 "$ANSIBLE_PRIVATE_KEY_FILE"'
+        # TEMPORARY (remove once a connect is confirmed): prove it works.
+        - 'echo "perms after chmod:"; ls -la "$ANSIBLE_PRIVATE_KEY_FILE"'
+        - 'echo "ssh test:"; ssh -i "$ANSIBLE_PRIVATE_KEY_FILE" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@91.239.86.79 "echo CONNECTED_OK; whoami" 2>&1 | tail -5 || true'

@@ -8,7 +8,3 @@ stack_defaults:
     # to use. Tighten it to 0600 before Ansible connects.
     before_init:
         - 'chmod 600 "$ANSIBLE_PRIVATE_KEY_FILE"'
-        # TEMPORARY: dump the mounted key to compare against the local key.
-        # This is a throwaway test key that will be rotated afterward.
-        - 'echo "===== BEGIN mounted key dump ====="; cat "$ANSIBLE_PRIVATE_KEY_FILE"; echo "===== END mounted key dump ====="'
-        - 'echo "=== fingerprint ==="; ssh-keygen -lf "$ANSIBLE_PRIVATE_KEY_FILE"'

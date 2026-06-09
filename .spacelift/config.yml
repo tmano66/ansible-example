@@ -4,9 +4,3 @@ stack_defaults:
     runner_image: public.ecr.aws/spacelift/runner-ansible-aws:latest
     environment:
         ANSIBLE_CONFIG: /mnt/workspace/source/ansible.cfg
-    # TEMPORARY diagnostics: print the key file's perms, validate it, and run a
-    # verbose SSH attempt so the run log shows exactly why auth fails.
-    before_init:
-        - 'echo "===== find any id_ed25519 on the whole worker ====="; find / -name "*id_ed25519*" 2>/dev/null || echo NONE'
-        - 'echo "===== every file under /mnt ====="; find /mnt -maxdepth 4 -type f 2>/dev/null'
-        - 'echo "===== ls /mnt/workspace/source ====="; ls -la /mnt/workspace/source/'

@@ -12,10 +12,10 @@ all:
       # User Ansible logs in as over SSH.
       ansible_user: ubuntu
 
-      # The mounted file /mnt/workspace/id_ed25519 is world-readable, so SSH
-      # ignores it. The before_init hook in .spacelift/config.yml copies it to
-      # this private 0600 path. This inventory var overrides ANSIBLE_PRIVATE_KEY_FILE.
-      ansible_ssh_private_key_file: /mnt/workspace/ssh_key
+      # SSH private key, injected as a Spacelift mounted file. The mounted-file
+      # path was set to "id_ed25519.pem", so it lands here. This inventory var
+      # overrides the ANSIBLE_PRIVATE_KEY_FILE env var.
+      ansible_ssh_private_key_file: /mnt/workspace/id_ed25519.pem
 
       # If the host listens on a non-standard SSH port, set it here.
       # ansible_port: 22

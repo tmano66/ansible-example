@@ -4,3 +4,9 @@ stack_defaults:
     runner_image: public.ecr.aws/spacelift/runner-ansible-aws:latest
     environment:
         ANSIBLE_CONFIG: /mnt/workspace/source/ansible.cfg
+    # The SSH key is delivered as a world-readable mounted file, which SSH
+    # silently refuses to use ("Permission denied (publickey)"). Copy it to a
+    # private 0600 file before Ansible connects. See inventory.yml.
+    before_init:
+        - cp /mnt/workspace/id_ed25519 /mnt/workspace/ssh_key
+        - chmod 600 /mnt/workspace/ssh_key

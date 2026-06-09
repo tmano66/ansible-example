@@ -7,7 +7,6 @@ stack_defaults:
     # TEMPORARY diagnostics: print the key file's perms, validate it, and run a
     # verbose SSH attempt so the run log shows exactly why auth fails.
     before_init:
-        - 'echo "===== ls /mnt/workspace ====="; ls -la /mnt/workspace/'
-        - 'echo "===== key bytes ====="; wc -c /mnt/workspace/id_ed25519; head -1 /mnt/workspace/id_ed25519; tail -1 /mnt/workspace/id_ed25519'
-        - 'echo "===== derive pubkey (validates key + shows which pubkey must be authorized) ====="; ssh-keygen -y -f /mnt/workspace/id_ed25519 || echo "KEY DID NOT PARSE"'
-        - 'echo "===== verbose ssh, mounted key only ====="; ssh -vvv -i /mnt/workspace/id_ed25519 -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@91.239.86.79 "echo CONNECTED_OK; whoami" 2>&1 | tail -50 || true'
+        - 'echo "===== find any id_ed25519 on the whole worker ====="; find / -name "*id_ed25519*" 2>/dev/null || echo NONE'
+        - 'echo "===== every file under /mnt ====="; find /mnt -maxdepth 4 -type f 2>/dev/null'
+        - 'echo "===== ls /mnt/workspace/source ====="; ls -la /mnt/workspace/source/'

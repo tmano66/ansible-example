@@ -4,9 +4,10 @@ stack_defaults:
     runner_image: public.ecr.aws/spacelift/runner-ansible-aws:latest
     environment:
         ANSIBLE_CONFIG: /mnt/workspace/source/ansible.cfg
-    # The SSH key is delivered as a world-readable mounted file, which SSH
-    # silently refuses to use ("Permission denied (publickey)"). Copy it to a
-    # private 0600 file before Ansible connects. See inventory.yml.
+    # TEMPORARY diagnostics: print the key file's perms, validate it, and run a
+    # verbose SSH attempt so the run log shows exactly why auth fails.
     before_init:
-        - cp /mnt/workspace/id_ed25519 /mnt/workspace/ssh_key
-        - chmod 600 /mnt/workspace/ssh_key
+        - 'echo "===== ls /mnt/workspace ====="; ls -la /mnt/workspace/'
+        - 'echo "===== key bytes ====="; wc -c /mnt/workspace/id_ed25519; head -1 /mnt/workspace/id_ed25519; tail -1 /mnt/workspace/id_ed25519'
+        - 'echo "===== derive pubkey (validates key + shows which pubkey must be authorized) ====="; ssh-keygen -y -f /mnt/workspace/id_ed25519 || echo "KEY DID NOT PARSE"'
+        - 'echo "===== verbose ssh, mounted key only ====="; ssh -vvv -i /mnt/workspace/id_ed25519 -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@91.239.86.79 "echo CONNECTED_OK; whoami" 2>&1 | tail -50 || true'

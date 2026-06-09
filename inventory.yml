@@ -1,0 +1,21 @@
+---
+# Static inventory for the SFC data center host.
+# Replaces the AWS EC2 dynamic inventory (aws_ec2.yml).
+#
+# TODO: fill in the real host details once you have them.
+all:
+  hosts:
+    sfc_host:
+      # Hostname or IP of the target node in the SFC data center.
+      ansible_host: 91.239.86.79
+
+      # User Ansible logs in as over SSH.
+      ansible_user: ubuntu
+
+      # Path to the SSH private key, injected as a Spacelift mounted file.
+      # Mounted files are rooted at /mnt/workspace/ (the relative_path field
+      # was set to "id_ed25519"). See the permissions note below.
+      ansible_ssh_private_key_file: /mnt/workspace/id_ed25519
+
+      # If the host listens on a non-standard SSH port, set it here.
+      # ansible_port: 22
